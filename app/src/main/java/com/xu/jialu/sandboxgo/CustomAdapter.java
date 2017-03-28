@@ -1,7 +1,7 @@
 package com.xu.jialu.sandboxgo;
 
 /**
- * Created by maxu on 3/27/17.
+ * Created by Jialu Xu on 3/27/17.
  */
 
 import java.util.HashMap;

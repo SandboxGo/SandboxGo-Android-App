@@ -1,19 +1,13 @@
 package com.xu.jialu.sandboxgo;
 
 import android.app.ProgressDialog;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
-import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -21,18 +15,31 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String HTTP_SANDBOX_IMAGE = "http://cis.bentley.edu/sandbox/wp-content/uploads/TutorImage/";
 
-    private String TAG = MainActivity.class.getSimpleName();
     private ProgressDialog pDialog;
     private ListView lv;
-    // URL to get contacts JSON
-    private static String url = "https://www.googleapis.com/calendar/v3/calendars/bentleycis@gmail.com/events?maxResults=500&timeMin=2017-04-03T01:01:01Z&timeMax=2017-04-04T01:01:01Z&key=AIzaSyCN8NNyQEJAeXf58TsoL2RdYj6Qn0EsmB0";
+    private String TAG = MainActivity.class.getSimpleName();
+    private static final String BASICURL = "https://www.googleapis.com/calendar/v3/calendars/bentleycis@gmail.com/events?&singleEvents=true&orderBy=startTime&timeMin=";
+    private static final String APIKEY = "&key=AIzaSyBXwv2VXYi1Xd6w04suJlAc2bhSO57xr-Y";
+    private static final String IMAGESUFFIX = "-150x150.jpg";
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    String formattedCurrentTime = sdf.format(new Date()).substring(0, 19) + "-04:00"; // UTC - 4 hours
+    String formattedTimeMax = sdf.format(new Date()).substring(0, 11) + "23:59:59-04:00"; // End of day (UTC - 4 hours)
+    Date currentTime;
+    Date startTime;
+    Date endTime;
+
     ArrayList<HashMap<String, String>> tutorList;
     ImageLoader imageLoader = ImageLoader.getInstance(); // Get singleton instance
 
@@ -50,11 +57,11 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        new GetEvents().execute();
+        new GetWorkingNowTutors().execute();
 
     }
 
-    private class GetEvents extends AsyncTask<Void, Void, Void> {
+    private class GetWorkingNowTutors extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
@@ -71,10 +78,11 @@ public class MainActivity extends AppCompatActivity {
         protected Void doInBackground(Void... arg0) {
             HttpHandler sh = new HttpHandler();
 
-            // Making a request to url and getting response
-            String jsonStr = sh.makeServiceCall(url);
+            // Making an HTTP request to Sandbox's Public Google Calendar API and getting response
+            String jsonStr = sh.makeServiceCall(BASICURL + formattedCurrentTime + "&timeMax=" + formattedTimeMax + APIKEY);
 
             Log.e(TAG, "Response from url: " + jsonStr);
+            Log.e(TAG, formattedTimeMax);
 
             if (jsonStr != null) {
                 try {
@@ -85,21 +93,44 @@ public class MainActivity extends AppCompatActivity {
 
                     // looping through All Contacts
                     for (int i = 0; i < events.length(); i++) {
-                        JSONObject c = events.getJSONObject(i);
+                        JSONObject eventItem = events.getJSONObject(i);
 
-                        String name = c.getString("summary");
-                        String imageSrc = HTTP_SANDBOX_IMAGE + name + "-150x150.jpg";
+                        String name = eventItem.getString("summary");
+                        String tutorStartTime = eventItem.getJSONObject("start").getString("dateTime");
+                        String tutorEndTime = eventItem.getJSONObject("end").getString("dateTime");
 
-                          // tmp hash map for single event
-                        HashMap<String, String> tutorMap = new HashMap<>();
+                        //convert time String to Date
+                        try {
+                            currentTime = sdf.parse(formattedCurrentTime);
+                            startTime = sdf.parse(tutorStartTime);
+                            endTime = sdf.parse(tutorEndTime);
+                        } catch (java.text.ParseException e) {
+                            e.printStackTrace();
+                        }
+                        Log.e(TAG, tutorStartTime);
+                        Log.e(TAG, tutorEndTime);
+                        Log.e(TAG, String.valueOf(currentTime.compareTo(startTime)));
+
+                        // fixing naming consistence problem
+                        if (name.equals("Emily Z.")){
+                            name = "EmilyZ";
+                        }
+                        String imageSrc = HTTP_SANDBOX_IMAGE + name + IMAGESUFFIX;
+
+                          // tmp hash map for working-now tutors
+                        HashMap<String, String> currentWorkingTutorMap = new HashMap<>();
 
                         // adding each child node to HashMap key => value
-                        tutorMap.put("name", name);
-                        tutorMap.put("imagesource", imageSrc);
+                        // if the current time has past the start time of the tutoring and has not yet past the end time
+                        // of the tutoring, then add
+                        if (currentTime.compareTo(startTime) >= 0 && currentTime.compareTo(endTime) == -1) {
+                            currentWorkingTutorMap.put("name", name);
+                            currentWorkingTutorMap.put("imagesource", imageSrc);
+                        }
 
 
                         // adding contact to contact list
-                        tutorList.add(tutorMap);
+                        tutorList.add(currentWorkingTutorMap);
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -146,8 +177,6 @@ public class MainActivity extends AppCompatActivity {
                     R.layout.list_item, new String[]{"name","imagesource"}, new int[]{R.id.name, R.id.tutorImage});
 
             lv.setAdapter(adapter);
-
-
 
         }
 
