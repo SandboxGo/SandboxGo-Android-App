@@ -1,11 +1,21 @@
 package com.xu.jialu.sandboxgo;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -19,6 +29,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -39,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
     Date currentTime;
     Date startTime;
     Date endTime;
+    static String selectedDate = "";
+    static String selectedTime = "";
+
+    private static TextView dateView;
+    private static TextView timeView;
 
     ArrayList<HashMap<String, String>> tutorList;
     ImageLoader imageLoader = ImageLoader.getInstance(); // Get singleton instance
@@ -55,7 +71,35 @@ public class MainActivity extends AppCompatActivity {
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
         ImageLoader.getInstance().init(config);
 
+        Button datepicker;
+        Button timepicker;
+        datepicker = (Button) findViewById(R.id.datePicker);
+        timepicker = (Button) findViewById(R.id.timePicker);
 
+        dateView = (TextView) findViewById(R.id.dateText);
+        timeView = (TextView) findViewById(R.id.timeText);
+
+        // get current time
+        try {
+            currentTime = sdf.parse(formattedCurrentTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+        datepicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(v);
+            }
+        });
+
+        timepicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimePickerDialog(v);
+            }
+        });
 
         new GetWorkingNowTutors().execute();
 
@@ -101,17 +145,13 @@ public class MainActivity extends AppCompatActivity {
 
                         //convert time String to Date
                         try {
-                            currentTime = sdf.parse(formattedCurrentTime);
                             startTime = sdf.parse(tutorStartTime);
                             endTime = sdf.parse(tutorEndTime);
                         } catch (java.text.ParseException e) {
                             e.printStackTrace();
                         }
-                        Log.e(TAG, tutorStartTime);
-                        Log.e(TAG, tutorEndTime);
-                        Log.e(TAG, String.valueOf(currentTime.compareTo(startTime)));
 
-                        // fixing naming consistence problem
+                        // fix naming consistence problem
                         if (name.equals("Emily Z.")){
                             name = "EmilyZ";
                         }
@@ -180,10 +220,76 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-
-
     }
 
+    // date picker method
+    public void showDatePickerDialog(View v) {
+        DialogFragment newFragment = new DatePickerFragment();
+        FragmentManager fm = MainActivity.this.getFragmentManager();
+        newFragment.show(fm, "datePicker");
+    }
+
+    // time picker method
+    public void showTimePickerDialog(View v) {
+        DialogFragment newFragment = new TimePickerFragment();
+        FragmentManager fm2 = MainActivity.this.getFragmentManager();
+        newFragment.show(fm2, "timePicker");
+    }
+
+
+    // Time Picker Static Class
+    public static class TimePickerFragment extends DialogFragment
+            implements TimePickerDialog.OnTimeSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current time as the default values for the picker
+            final Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+
+            // Create a new instance of TimePickerDialog and return it
+            return new TimePickerDialog(getActivity(), this, hour, minute,
+                    android.text.format.DateFormat.is24HourFormat(getActivity()));
+        }
+
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            // Do something with the time chosen by the user
+            selectedTime = String.format("%02d:%02d:00", hourOfDay, minute);
+            timeView.setText(selectedTime);
+            applyTime();
+        }
+    }
+
+    // Date Picker Static Class
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            // Do something with the date chosen by the user
+            selectedDate = String.format("%04d-%02d-%02d", year, month, day);
+            dateView.setText(selectedDate);
+            applyTime();
+        }
+    }
+
+    // apply selected date and time
+    public static void applyTime() {
+        String newDate = selectedDate + selectedTime;
+        String newTimeMax = selectedDate + "T23:59:59-04:00";
+    }
 
 }
 
