@@ -18,14 +18,11 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,16 +45,17 @@ public class MainActivity extends AppCompatActivity {
     String formattedCurrentTime = sdf.format(new Date()).substring(0, 19) + "-04:00"; // UTC - 4 hours
     String formattedTimeMax = sdf.format(new Date()).substring(0, 11) + "23:59:59-04:00"; // End of day (UTC - 4 hours)
     Date currentTime;
+    Date newDateAndTime;
     Date startTime;
     Date endTime;
     static String selectedDate = "";
     static String selectedTime = "";
+    HttpHandler sh = new HttpHandler();
 
     private static TextView dateView;
     private static TextView timeView;
 
     ArrayList<HashMap<String, String>> tutorList;
-    ImageLoader imageLoader = ImageLoader.getInstance(); // Get singleton instance
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +66,6 @@ public class MainActivity extends AppCompatActivity {
 
         lv = (ListView) findViewById(R.id.list);
 
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
-        ImageLoader.getInstance().init(config);
 
         Button datepicker;
         Button timepicker;
@@ -120,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            HttpHandler sh = new HttpHandler();
 
             // Making an HTTP request to Sandbox's Public Google Calendar API and getting response
             String jsonStr = sh.makeServiceCall(BASICURL + formattedCurrentTime + "&timeMax=" + formattedTimeMax + APIKEY);
@@ -152,8 +147,14 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         // fix naming consistence problem
-                        if (name.equals("Emily Z.")){
+                        if (name.equals("Emily Z")){
                             name = "EmilyZ";
+                        }
+                        if (name.equals("Emily K.")){
+                            name = "EmilyK";
+                        }
+                        if (name.equals("Se Jin")){
+                            name = "SeJin";
                         }
                         String imageSrc = HTTP_SANDBOX_IMAGE + name + IMAGESUFFIX;
 
@@ -257,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
             // Do something with the time chosen by the user
             selectedTime = String.format("%02d:%02d:00", hourOfDay, minute);
             timeView.setText(selectedTime);
-            applyTime();
+            ((MainActivity) getActivity()).applyTime();
         }
     }
 
@@ -279,17 +280,163 @@ public class MainActivity extends AppCompatActivity {
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
             // Do something with the date chosen by the user
-            selectedDate = String.format("%04d-%02d-%02d", year, month, day);
+            selectedDate = String.format("%04d-%02d-%02d", year, month + 1, day);
             dateView.setText(selectedDate);
-            applyTime();
+            ((MainActivity) getActivity()).applyTime();
         }
     }
 
-    // apply selected date and time
-    public static void applyTime() {
-        String newDate = selectedDate + selectedTime;
-        String newTimeMax = selectedDate + "T23:59:59-04:00";
+        // apply selected date and time
+    public void applyTime() {
+        new GetWorkingTutors().execute();
     }
+
+
+    // Get selected-time working tutors via an AsyncTask
+    private class GetWorkingTutors extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(MainActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+            // clear previous tutorList
+            tutorList.clear();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+
+            String newDateStr;
+            if (!selectedTime.equals("")) {
+                newDateStr = selectedDate + "T" + selectedTime + "-04:00";
+            } else {
+                newDateStr = selectedDate + "T00:00:00-04:00";
+            }
+            String newTimeMax = selectedDate + "T23:59:59-04:00";
+
+            // get selected time
+            try {
+                newDateAndTime = sdf.parse(newDateStr);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            Log.e(TAG, selectedTime);
+            Log.e(TAG, newDateStr);
+            Log.e(TAG, newTimeMax);
+            Log.e(TAG, BASICURL + newDateStr + "&timeMax=" + newTimeMax + APIKEY);
+
+            // Making an HTTP request to Sandbox's Public Google Calendar API and getting response
+            String newJSONStr = sh.makeServiceCall(BASICURL + newDateStr + "&timeMax=" + newTimeMax + APIKEY);
+
+            Log.e(TAG, "Response from url: " + newJSONStr);
+
+            if (newJSONStr != null) {
+                try {
+                    JSONObject jsonObj = new JSONObject(newJSONStr);
+
+                    // Getting JSON Array node
+                    JSONArray events = jsonObj.getJSONArray("items");
+
+                    // looping through All Contacts
+                    for (int i = 0; i < events.length(); i++) {
+                        JSONObject eventItem = events.getJSONObject(i);
+
+                        String name = eventItem.getString("summary");
+                        String tutorStartTime = eventItem.getJSONObject("start").getString("dateTime");
+                        String tutorEndTime = eventItem.getJSONObject("end").getString("dateTime");
+                        Log.e(TAG, tutorStartTime);
+                        Log.e(TAG, tutorEndTime);
+                        //convert time String to Date
+                        try {
+                            startTime = sdf.parse(tutorStartTime);
+                            endTime = sdf.parse(tutorEndTime);
+                        } catch (java.text.ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                        // fix naming consistence problem
+                        if (name.equals("Emily Z")){
+                            name = "EmilyZ";
+                        }
+                        if (name.equals("Emily K.")){
+                            name = "EmilyK";
+                        }
+                        if (name.equals("Se Jin")){
+                            name = "SeJin";
+                        }
+                        String imageSrc = HTTP_SANDBOX_IMAGE + name + IMAGESUFFIX;
+
+                        // tmp hash map for working-now tutors
+                        HashMap<String, String> currentWorkingTutorMap = new HashMap<>();
+
+                        // adding each child node to HashMap key => value
+                        // if the current time has past the start time of the tutoring and has not yet past the end time
+                        // of the tutoring, then add; OR if the user only chooses date, show ALL tutors working on that day
+                        if (newDateAndTime.compareTo(startTime) >= 0 && newDateAndTime.compareTo(endTime) == -1 || newDateStr.substring(10).equals("T00:00:00-04:00")) {
+                            currentWorkingTutorMap.put("name", name);
+                            currentWorkingTutorMap.put("imagesource", imageSrc);
+                        }
+
+
+                        // adding contact to contact list
+                        tutorList.add(currentWorkingTutorMap);
+                    }
+                } catch (final JSONException e) {
+                    Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),
+                                    "Json parsing error: " + e.getMessage(),
+                                    Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    });
+
+                }
+            } else {
+                Log.e(TAG, "Couldn't get json from server.");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),
+                                "Couldn't get json from server. Check LogCat for possible errors!",
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+            /**
+             * Updating parsed JSON data into ListView
+             * */
+
+            CustomAdapter adapter = new CustomAdapter(
+                    MainActivity.this, tutorList,
+                    R.layout.list_item, new String[]{"name","imagesource"}, new int[]{R.id.name, R.id.tutorImage});
+
+            lv.setAdapter(adapter);
+
+        }
+
+    }
+
 
 }
 

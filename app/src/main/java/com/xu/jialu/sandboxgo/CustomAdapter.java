@@ -39,15 +39,15 @@ public class CustomAdapter extends SimpleAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         Holder holder=new Holder();
         View vi = convertView;
-        if (convertView == null)
+        if (convertView == null) {
             vi = inflater.inflate(R.layout.list_item, null);
-
+        }
 
         HashMap<String, Object> data = (HashMap<String, Object>) getItem(position);
 
         // display tutor images
-        new DownloadTask((ImageView) vi.findViewById(R.id.tutorImage))
-                .execute((String) data.get("imagesource"));
+            new DownloadTask((ImageView) vi.findViewById(R.id.tutorImage))
+                    .execute((String) data.get("imagesource"));
 
         // display tutor names in the textView
         holder.tv=(TextView) vi.findViewById(R.id.name);
