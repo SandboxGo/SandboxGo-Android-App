@@ -32,7 +32,8 @@ public class CustomAdapter extends SimpleAdapter {
 
     public class Holder
     {
-        TextView tv;
+        TextView tv_name;
+        TextView tv_course;
     }
 
     @Override
@@ -50,8 +51,10 @@ public class CustomAdapter extends SimpleAdapter {
                     .execute((String) data.get("imagesource"));
 
         // display tutor names in the textView
-        holder.tv=(TextView) vi.findViewById(R.id.name);
-        holder.tv.setText((String) data.get("name"));
+        holder.tv_name=(TextView) vi.findViewById(R.id.name);
+        holder.tv_course=(TextView) vi.findViewById(R.id.course);
+        holder.tv_name.setText((String) data.get("name"));
+        holder.tv_course.setText((String) data.get("course"));
 
         return vi;
     }

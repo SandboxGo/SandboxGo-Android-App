@@ -157,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
                             name = "SeJin";
                         }
                         String imageSrc = HTTP_SANDBOX_IMAGE + name + IMAGESUFFIX;
+                        String course = getTutorCourse(name);
 
                           // tmp hash map for working-now tutors
                         HashMap<String, String> currentWorkingTutorMap = new HashMap<>();
@@ -167,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
                         if (currentTime.compareTo(startTime) >= 0 && currentTime.compareTo(endTime) == -1) {
                             currentWorkingTutorMap.put("name", name);
                             currentWorkingTutorMap.put("imagesource", imageSrc);
+                            currentWorkingTutorMap.put("course", course);
                         }
 
 
@@ -215,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
 
             CustomAdapter adapter = new CustomAdapter(
                     MainActivity.this, tutorList,
-                    R.layout.list_item, new String[]{"name","imagesource"}, new int[]{R.id.name, R.id.tutorImage});
+                    R.layout.list_item, new String[]{"name","imagesource","course"}, new int[]{R.id.name, R.id.tutorImage, R.id.course});
 
             lv.setAdapter(adapter);
 
@@ -361,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         // fix naming consistence problem
-                        if (name.equals("Emily Z")){
+                        if (name.equals("Emily Z") || name.equals("Emily Z.")){
                             name = "EmilyZ";
                         }
                         if (name.equals("Emily K.")){
@@ -371,6 +373,7 @@ public class MainActivity extends AppCompatActivity {
                             name = "SeJin";
                         }
                         String imageSrc = HTTP_SANDBOX_IMAGE + name + IMAGESUFFIX;
+                        String course = getTutorCourse(name);
 
                         // tmp hash map for working-now tutors
                         HashMap<String, String> currentWorkingTutorMap = new HashMap<>();
@@ -381,6 +384,7 @@ public class MainActivity extends AppCompatActivity {
                         if (newDateAndTime.compareTo(startTime) >= 0 && newDateAndTime.compareTo(endTime) == -1 || newDateStr.substring(10).equals("T00:00:00-04:00")) {
                             currentWorkingTutorMap.put("name", name);
                             currentWorkingTutorMap.put("imagesource", imageSrc);
+                            currentWorkingTutorMap.put("course", course);
                         }
 
 
@@ -429,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
 
             CustomAdapter adapter = new CustomAdapter(
                     MainActivity.this, tutorList,
-                    R.layout.list_item, new String[]{"name","imagesource"}, new int[]{R.id.name, R.id.tutorImage});
+                    R.layout.list_item, new String[]{"name","imagesource","course"}, new int[]{R.id.name, R.id.tutorImage, R.id.course});
 
             lv.setAdapter(adapter);
 
@@ -437,6 +441,67 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    // Get specific courses for a specific tutor
+    private String getTutorCourse(String name) {
+        switch (name.toLowerCase()) {
+            case "max":
+                return "IT101, CS603, CS605, CS607";
+            case "mark":
+                return "IT101, CS603, CS605, CS607";
+            case "emilyk":
+                return "IT101, CS603, CS605, CS607";
+            case "jake":
+                return "IT101, CS603, CS605, CS607";
+            case "tim":
+                return "IT101, CS603, CS605, CS607";
+            case "karan":
+                return "IT101, CS603, CS605, CS607";
+            case "nicollette":
+                return "IT101, CS603, CS605, CS607";
+            case "emilyz":
+                return "IT101, CS603, CS605, CS607";
+            case "brandon":
+                return "IT101, CS603, CS605, CS607";
+            case "taylor":
+                return "IT101, CS603, CS605, CS607";
+            case "yang":
+                return "IT101, CS603, CS605, CS607";
+            case "jacob":
+                return "IT101, CS603, CS605, CS607";
+            case "jonathan":
+                return "IT101, CS603, CS605, CS607";
+            case "saalik":
+                return "IT101, CS603, CS605, CS607";
+            case "yue":
+                return "IT101, CS603, CS605, CS607";
+            case "mae":
+                return "IT101, CS603, CS605, CS607";
+            case "rob":
+                return "IT101, CS603, CS605, CS607";
+            case "angela":
+                return "IT101, CS603, CS605, CS607";
+            case "kaitlyn":
+                return "IT101, CS603, CS605, CS607";
+            case "michael":
+                return "IT101, CS603, CS605, CS607";
+            case "anoushka":
+                return "IT101, CS603, CS605, CS607";
+            case "sejin":
+                return "IT101, CS603, CS605, CS607";
+            case "sebastian":
+                return "IT101, CS603, CS605, CS607";
+            case "becky":
+                return "IT101, CS603, CS605, CS607";
+            case "sumant":
+                return "IT101, CS603, CS605, CS607";
+            case "pranita":
+                return "IT101, CS603, CS605, CS607";
+            case "andrew":
+                return "IT101, CS603, CS605, CS607";
+        }
+        return "Sorry, no course information for this tutor";
+    }
 
 }
 
