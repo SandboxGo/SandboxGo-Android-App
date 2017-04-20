@@ -47,8 +47,8 @@
         android:layout_below="@+id/textView1"
         android:layout_toRightOf="@+id/datePicker"
         android:layout_toEndOf="@+id/datePicker"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp" />
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp" />
 
     <TextView
         android:text="Choose a date"
@@ -73,5 +73,17 @@
         android:layout_toRightOf="@+id/dateText"
         android:layout_below="@id/timePicker"
         />
+
+    <Button
+        android:text="Now"
+        android:textColor="@color/colorPrimary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/timePicker"
+        android:layout_toRightOf="@+id/timePicker"
+        android:layout_toEndOf="@+id/timePicker"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
+        android:id="@+id/now" />
 
 </RelativeLayout>

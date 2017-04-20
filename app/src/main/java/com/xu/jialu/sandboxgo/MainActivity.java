@@ -69,8 +69,10 @@ public class MainActivity extends AppCompatActivity {
 
         Button datepicker;
         Button timepicker;
+        Button nowpicker;
         datepicker = (Button) findViewById(R.id.datePicker);
         timepicker = (Button) findViewById(R.id.timePicker);
+        nowpicker = (Button) findViewById(R.id.now);
 
         dateView = (TextView) findViewById(R.id.dateText);
         timeView = (TextView) findViewById(R.id.timeText);
@@ -94,6 +96,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 showTimePickerDialog(v);
+            }
+        });
+
+        nowpicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tutorList.clear();
+                new GetWorkingNowTutors().execute();
             }
         });
 
@@ -122,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
             Log.e(TAG, "Response from url: " + jsonStr);
             Log.e(TAG, formattedTimeMax);
+
 
             if (jsonStr != null) {
                 try {
@@ -159,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                         String imageSrc = HTTP_SANDBOX_IMAGE + name + IMAGESUFFIX;
                         String course = getTutorCourse(name);
 
-                          // tmp hash map for working-now tutors
+                        // tmp hash map for working-now tutors
                         HashMap<String, String> currentWorkingTutorMap = new HashMap<>();
 
                         // adding each child node to HashMap key => value
