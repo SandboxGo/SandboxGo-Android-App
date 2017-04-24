@@ -6,6 +6,8 @@ import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String BASICURL = "https://www.googleapis.com/calendar/v3/calendars/bentleycis@gmail.com/events?&singleEvents=true&orderBy=startTime&timeMin=";
     private static final String APIKEY = "&key=AIzaSyBXwv2VXYi1Xd6w04suJlAc2bhSO57xr-Y";
     private static final String IMAGESUFFIX = "-150x150.jpg";
+    private Button buttonWeb,buttonMap;
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     String formattedCurrentTime = sdf.format(new Date()).substring(0, 19) + "-04:00"; // UTC - 4 hours
@@ -73,6 +76,21 @@ public class MainActivity extends AppCompatActivity {
         datepicker = (Button) findViewById(R.id.datePicker);
         timepicker = (Button) findViewById(R.id.timePicker);
         nowpicker = (Button) findViewById(R.id.now);
+        buttonWeb = (Button) findViewById(R.id.web);
+        buttonWeb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewWebPage(v);
+            }
+        });
+        buttonMap = (Button) findViewById(R.id.map);
+        buttonMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findLocation(v);
+            }
+        });
+
 
         dateView = (TextView) findViewById(R.id.dateText);
         timeView = (TextView) findViewById(R.id.timeText);
@@ -250,6 +268,23 @@ public class MainActivity extends AppCompatActivity {
         newFragment.show(fm2, "timePicker");
     }
 
+    public void viewWebPage(View v){
+        Intent intent1 = new Intent(this, WebLookUp.class);
+        startActivity(intent1);
+    }
+    public void findLocation(View v) {
+
+        //Uri uri = Uri.parse("geo:0,0?q=175+forest+street+waltham+ma");
+        Uri location = Uri.parse("geo:42.3872708,-71.22050530000001?z=18&q=Bentley University Smith Academic Technology Center");
+        Intent intent3 = new Intent(Intent.ACTION_VIEW, location);
+        if (intent3.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent3);
+        }
+        Toast.makeText(this, "Second Floor, Room 234", Toast.LENGTH_LONG).show();
+
+    }
+
+
 
     // Time Picker Static Class
     public static class TimePickerFragment extends DialogFragment
@@ -299,7 +334,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-        // apply selected date and time
+    // apply selected date and time
     public void applyTime() {
         new GetWorkingTutors().execute();
     }
