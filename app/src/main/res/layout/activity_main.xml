@@ -26,40 +26,21 @@
     <ListView
         android:id="@+id/list"
         android:layout_width="fill_parent"
-        android:layout_height="320dp"
+        android:layout_height="450dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/dateText" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:text="Choose Date"
-        android:layout_height="60dp"
-        android:id="@+id/datePicker"
-        android:layout_below="@+id/textView1"
-        android:layout_alignParentLeft="true"  />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:text="Choose Time"
-        android:layout_height="60dp"
-        android:id="@+id/timePicker"
-        android:layout_below="@+id/textView1"
-        android:layout_toRightOf="@+id/datePicker"
-        android:layout_toEndOf="@+id/datePicker"
-        android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp" />
-
     <TextView
-        android:text="Choose a date"
+        android:id="@+id/dateText"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:paddingLeft="5dp"
-        android:textSize="20sp"
-        android:id="@+id/dateText"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/datePicker"
-        />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView1"
+        android:paddingLeft="5dp"
+        android:text="Select date"
+        android:textSize="20sp" />
 
 
     <TextView
@@ -69,55 +50,14 @@
         android:paddingLeft="5dp"
         android:textSize="20sp"
         android:id="@+id/timeText"
-        android:layout_alignLeft="@id/timePicker"
-        android:layout_toRightOf="@+id/dateText"
-        android:layout_below="@id/timePicker"
-        />
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/textView1" />
 
-    <Button
-        android:text="Now"
-        android:textColor="@color/colorPrimary"
+    <ImageView android:id="@+id/simple_anim"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/timePicker"
-        android:layout_toRightOf="@+id/timePicker"
-        android:layout_toEndOf="@+id/timePicker"
-        android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp"
-        android:id="@+id/now" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:text="Website"
-        android:layout_height="60dp"
-        android:id="@+id/web"
-        android:layout_above="@+id/now"
-        android:layout_alignLeft="@+id/now"
-        android:layout_alignStart="@+id/now" />
-    <Button
-        android:layout_width="wrap_content"
-        android:text="Location"
-        android:layout_height="60dp"
-        android:id="@+id/map"
-        android:layout_alignBaseline="@+id/textView1"
-        android:layout_alignBottom="@+id/textView1"
-        android:layout_toRightOf="@+id/textView1"
-        android:layout_toEndOf="@+id/textView1" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/timeText"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignStart="@+id/timeText"
-        android:text="TextView"
-        android:textAlignment="textEnd"
-        android:textColor="@android:color/holo_red_light"
-        android:textStyle="bold"
-        tools:text="Phone: 781 891-3491  Email: ga_cis_sandbox@bentley.edu " />
-
+        android:layout_centerInParent="true"/>
 
 </RelativeLayout>

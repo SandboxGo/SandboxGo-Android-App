@@ -4,18 +4,37 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Vibrator;
+import android.speech.tts.TextToSpeech;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -31,8 +50,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
 
     public static final String HTTP_SANDBOX_IMAGE = "http://cis.bentley.edu/sandbox/wp-content/uploads/TutorImage/";
 
@@ -42,7 +65,16 @@ public class MainActivity extends AppCompatActivity {
     private static final String BASICURL = "https://www.googleapis.com/calendar/v3/calendars/bentleycis@gmail.com/events?&singleEvents=true&orderBy=startTime&timeMin=";
     private static final String APIKEY = "&key=AIzaSyBXwv2VXYi1Xd6w04suJlAc2bhSO57xr-Y";
     private static final String IMAGESUFFIX = "-150x150.jpg";
-    private Button buttonWeb,buttonMap;
+    final int Now = Menu.FIRST + 1;
+    final int Date = Menu.FIRST + 2;
+    final int Time = Menu.FIRST + 3;
+    final int Web = Menu.FIRST + 4;
+    final int Map = Menu.FIRST + 5;
+    final int Phone = Menu.FIRST + 6;
+    BroadcastReceiver receiver;
+    Intent intent = new Intent("hours");
+    Message finalmsg;
+    private TextToSpeech speaker;
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     String formattedCurrentTime = sdf.format(new Date()).substring(0, 19) + "-04:00"; // UTC - 4 hours
@@ -59,6 +91,13 @@ public class MainActivity extends AppCompatActivity {
     private static TextView timeView;
 
     ArrayList<HashMap<String, String>> tutorList;
+    Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+
+            intent.putExtra("hours", msg.obj.toString());
+            sendBroadcast(intent);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,64 +109,110 @@ public class MainActivity extends AppCompatActivity {
         lv = (ListView) findViewById(R.id.list);
 
 
-        Button datepicker;
-        Button timepicker;
-        Button nowpicker;
-        datepicker = (Button) findViewById(R.id.datePicker);
-        timepicker = (Button) findViewById(R.id.timePicker);
-        nowpicker = (Button) findViewById(R.id.now);
-        buttonWeb = (Button) findViewById(R.id.web);
-        buttonWeb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewWebPage(v);
-            }
-        });
-        buttonMap = (Button) findViewById(R.id.map);
-        buttonMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                findLocation(v);
-            }
-        });
-
-
         dateView = (TextView) findViewById(R.id.dateText);
         timeView = (TextView) findViewById(R.id.timeText);
-
         // get current time
         try {
             currentTime = sdf.parse(formattedCurrentTime);
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        // register & define filter for BroadcastReveiver
+        IntentFilter mainFilter = new IntentFilter("hours");
+        receiver = new MyMainLocalReceiver();
+        registerReceiver(receiver, mainFilter);
 
+        //Initialize Text to Speech engine (context, listener object)
+        speaker = new TextToSpeech(this, (TextToSpeech.OnInitListener) this);
+        ImageView img = (ImageView) findViewById(R.id.simple_anim);
+        img.setBackgroundResource(R.drawable.simple_animation);
 
-        datepicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePickerDialog(v);
-            }
-        });
+        AnimationRoutine1 task1 = new AnimationRoutine1();
+        AnimationRoutine2 task2 = new AnimationRoutine2();
 
-        timepicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTimePickerDialog(v);
-            }
-        });
-
-        nowpicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tutorList.clear();
-                new GetWorkingNowTutors().execute();
-            }
-        });
+        Timer t = new Timer();
+        t.schedule(task1,0);
+        Timer t2 = new Timer();
+        t2.schedule(task2, 1000000);
 
         new GetWorkingNowTutors().execute();
 
     }
+    class AnimationRoutine1 extends TimerTask {
+
+        @Override
+        public void run() {
+            ImageView img = (ImageView) findViewById(R.id.simple_anim);
+            AnimationDrawable frameAnimation = (AnimationDrawable) img.getBackground();
+            frameAnimation.start();
+        }
+    }
+
+    class AnimationRoutine2 extends TimerTask {
+
+        @Override
+        public void run() {
+            ImageView img = (ImageView) findViewById(R.id.simple_anim);
+            AnimationDrawable frameAnimation = (AnimationDrawable) img.getBackground();
+            frameAnimation.stop();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuItem item1 = menu.add(0, Now, Menu.NONE, "Now");
+        MenuItem item2 = menu.add(0, Date, Menu.NONE, "Visting Date");
+        MenuItem item3 = menu.add(0, Time, Menu.NONE, "Visting Time");
+        MenuItem item4 = menu.add(0, Web, Menu.NONE, "Sandbox Website");
+        MenuItem item5 = menu.add(0, Map, Menu.NONE, "Locate Sandbox");
+        MenuItem item6 = menu.add(0, Phone, Menu.NONE, "Dial");
+        item1.setShortcut('1', 'n');
+        item2.setShortcut('2', 'd');
+        item3.setShortcut('3', 't');
+        item4.setShortcut('4', 'w');
+        item5.setShortcut('5', 'm');
+        item6.setShortcut('6', 'c');
+
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case Now:
+                tutorList.clear();
+                new GetWorkingNowTutors().execute();
+                speak("Tutors on duty");
+                return true;
+
+            case Time:
+                speak("Select time");
+                showTimePickerDialog();
+                return true;
+            case Date:
+                speak("Select date");
+                showDatePickerDialog();
+                return true;
+            case Web:
+                viewWebPage();
+                return true;
+            case Map:
+                findLocation();
+                return true;
+            case Phone:
+                callSandbox();
+                return true;
+
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
+
 
     private class GetWorkingNowTutors extends AsyncTask<Void, Void, Void> {
 
@@ -176,13 +261,13 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         // fix naming consistence problem
-                        if (name.equals("Emily Z")){
+                        if (name.equals("Emily Z")) {
                             name = "EmilyZ";
                         }
-                        if (name.equals("Emily K.")){
+                        if (name.equals("Emily K.")) {
                             name = "EmilyK";
                         }
-                        if (name.equals("Se Jin")){
+                        if (name.equals("Se Jin")) {
                             name = "SeJin";
                         }
                         String imageSrc = HTTP_SANDBOX_IMAGE + name + IMAGESUFFIX;
@@ -246,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
 
             CustomAdapter adapter = new CustomAdapter(
                     MainActivity.this, tutorList,
-                    R.layout.list_item, new String[]{"name","imagesource","course"}, new int[]{R.id.name, R.id.tutorImage, R.id.course});
+                    R.layout.list_item, new String[]{"name", "imagesource", "course"}, new int[]{R.id.name, R.id.tutorImage, R.id.course});
 
             lv.setAdapter(adapter);
 
@@ -255,35 +340,57 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // date picker method
-    public void showDatePickerDialog(View v) {
+    public void showDatePickerDialog() {
         DialogFragment newFragment = new DatePickerFragment();
         FragmentManager fm = MainActivity.this.getFragmentManager();
         newFragment.show(fm, "datePicker");
     }
 
     // time picker method
-    public void showTimePickerDialog(View v) {
+    public void showTimePickerDialog() {
         DialogFragment newFragment = new TimePickerFragment();
         FragmentManager fm2 = MainActivity.this.getFragmentManager();
         newFragment.show(fm2, "timePicker");
     }
 
-    public void viewWebPage(View v){
-        Intent intent1 = new Intent(this, WebLookUp.class);
+    //view Sandbox website
+    public void viewWebPage() {
+        speak("Visting Sandbox Webpage");
+        Uri uri2 = Uri.parse("http://cis.bentley.edu/sandbox/");
+        Intent intent1 = new Intent(Intent.ACTION_VIEW, uri2);
         startActivity(intent1);
     }
-    public void findLocation(View v) {
 
+    //Locate sandbox on Googlemap
+    public void findLocation() {
+        speak("Locating Sandbox");
         //Uri uri = Uri.parse("geo:0,0?q=175+forest+street+waltham+ma");
         Uri location = Uri.parse("geo:42.3872708,-71.22050530000001?z=18&q=Bentley University Smith Academic Technology Center");
         Intent intent3 = new Intent(Intent.ACTION_VIEW, location);
         if (intent3.resolveActivity(getPackageManager()) != null) {
             startActivity(intent3);
         }
+        //Show the location in Smith with toast
         Toast.makeText(this, "Second Floor, Room 234", Toast.LENGTH_LONG).show();
 
     }
 
+    public void callSandbox() {
+        Uri phoneNum = Uri.parse("tel:781 891-3491");
+        Intent intent2 = new Intent(Intent.ACTION_CALL, phoneNum);
+
+        //Assign permission to make the call
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CALL_PHONE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{android.Manifest.permission.CALL_PHONE},
+                    1);
+            startActivity(intent2);
+        } else {
+            startActivity(intent2);
+        }
+
+    }
 
 
     // Time Picker Static Class
@@ -409,13 +516,13 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         // fix naming consistence problem
-                        if (name.equals("Emily Z") || name.equals("Emily Z.")){
+                        if (name.equals("Emily Z") || name.equals("Emily Z.")) {
                             name = "EmilyZ";
                         }
-                        if (name.equals("Emily K.")){
+                        if (name.equals("Emily K.")) {
                             name = "EmilyK";
                         }
-                        if (name.equals("Se Jin")){
+                        if (name.equals("Se Jin")) {
                             name = "SeJin";
                         }
                         String imageSrc = HTTP_SANDBOX_IMAGE + name + IMAGESUFFIX;
@@ -479,7 +586,7 @@ public class MainActivity extends AppCompatActivity {
 
             CustomAdapter adapter = new CustomAdapter(
                     MainActivity.this, tutorList,
-                    R.layout.list_item, new String[]{"name","imagesource","course"}, new int[]{R.id.name, R.id.tutorImage, R.id.course});
+                    R.layout.list_item, new String[]{"name", "imagesource", "course"}, new int[]{R.id.name, R.id.tutorImage, R.id.course});
 
             lv.setAdapter(adapter);
 
@@ -549,6 +656,98 @@ public class MainActivity extends AppCompatActivity {
         return "Sorry, no course information for this tutor";
     }
 
+    // push sandbox open hour as notification
+    public void sendNotification(String value) {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.notification_icon);
+        mBuilder.setContentTitle("Sandbox Open Hour");
+        mBuilder.setContentText(value);
+
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+// notificationID allows you to update the notification later on.
+        mNotificationManager.notify(0, mBuilder.build());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            unregisterReceiver(receiver);
+        } catch (Exception e) {
+
+            Log.e("log", e.getMessage());
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // create background thread where the busy work will be done
+        Thread t1 = new Thread(background);
+        t1.start();
+    }
+
+
+    Runnable background = new Runnable() {
+        public void run() {
+            finalmsg = handler.obtainMessage();
+            Calendar calendar = Calendar.getInstance();
+            int day = calendar.get(Calendar.DAY_OF_WEEK);
+
+
+            if (day == Calendar.SUNDAY) {
+                finalmsg.obj = "12 PM - midnight*  *If no one is here at 11 PM, we will close at 11 PM";
+            } else if (day == Calendar.MONDAY || day == Calendar.TUESDAY || day == Calendar.WEDNESDAY) {
+                finalmsg.obj = "10 AM - midnight*  *If no one is here at 11 PM, we will close at 11 PM ";
+            } else if (day == Calendar.THURSDAY) {
+                finalmsg.obj = "10 AM- 11 PM ";
+            } else if (day == Calendar.FRIDAY) {
+                finalmsg.obj = "10 AM- 6 PM ";
+            } else if (day == Calendar.SATURDAY) {
+                finalmsg.obj = "1 PM - 6 PM ";
+            }
+
+            handler.sendMessage(finalmsg);
+
+
+        }
+
+    };
+
+
+    public class MyMainLocalReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String msg = intent.getExtras().getString("hours");
+            sendNotification(msg);
+        }
+    }
+
+    //speaks the contents of output
+    public void speak(String output) {
+        speaker.speak(output, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    // Implements TextToSpeech.OnInitListener.
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            // Set preferred language to US english.
+            int result = speaker.setLanguage(Locale.US);
+        }
+    }
+
+
 }
+
+
+
+
+
+
+
+
+
 
 
