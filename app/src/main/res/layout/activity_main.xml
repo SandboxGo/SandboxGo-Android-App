@@ -22,6 +22,24 @@
         android:textStyle="bold"
         android:typeface="normal" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:text="Choose Date"
+        android:layout_height="50dp"
+        android:id="@+id/datePicker"
+        android:layout_below="@+id/textView1"
+        android:layout_alignParentLeft="true"  />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:text="Choose Time"
+        android:layout_height="50dp"
+        android:id="@+id/timePicker"
+        android:layout_below="@+id/textView1"
+        android:layout_toRightOf="@+id/datePicker"
+        android:layout_toEndOf="@+id/datePicker"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp" />
 
     <ListView
         android:id="@+id/list"
@@ -29,7 +47,8 @@
         android:layout_height="450dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/dateText" />
+        android:background="#fff8c0"
+        android:layout_below="@+id/dateText"/>
 
     <TextView
         android:id="@+id/dateText"
@@ -37,7 +56,7 @@
         android:layout_height="30dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView1"
+        android:layout_below="@id/datePicker"
         android:paddingLeft="5dp"
         android:text="Select date"
         android:textSize="20sp" />
@@ -50,14 +69,17 @@
         android:paddingLeft="5dp"
         android:textSize="20sp"
         android:id="@+id/timeText"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/textView1" />
+        android:layout_alignLeft="@id/timePicker"
+        android:layout_below="@id/timePicker" />
 
     <ImageView android:id="@+id/simple_anim"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="-10dp"
+        android:layout_marginRight="-10dp"
         android:layout_alignParentRight="true"
         android:layout_centerInParent="true"/>
+
 
 </RelativeLayout>

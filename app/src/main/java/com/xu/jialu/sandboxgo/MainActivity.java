@@ -66,15 +66,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private static final String APIKEY = "&key=AIzaSyBXwv2VXYi1Xd6w04suJlAc2bhSO57xr-Y";
     private static final String IMAGESUFFIX = "-150x150.jpg";
     final int Now = Menu.FIRST + 1;
-    final int Date = Menu.FIRST + 2;
-    final int Time = Menu.FIRST + 3;
-    final int Web = Menu.FIRST + 4;
-    final int Map = Menu.FIRST + 5;
-    final int Phone = Menu.FIRST + 6;
+    final int Web = Menu.FIRST + 2;
+    final int Map = Menu.FIRST + 3;
+    final int Phone = Menu.FIRST + 4;
     BroadcastReceiver receiver;
     Intent intent = new Intent("hours");
     Message finalmsg;
     private TextToSpeech speaker;
+
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     String formattedCurrentTime = sdf.format(new Date()).substring(0, 19) + "-04:00"; // UTC - 4 hours
@@ -130,6 +129,25 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         AnimationRoutine1 task1 = new AnimationRoutine1();
         AnimationRoutine2 task2 = new AnimationRoutine2();
 
+        Button datepicker;
+        Button timepicker;
+        datepicker = (Button) findViewById(R.id.datePicker);
+        timepicker = (Button) findViewById(R.id.timePicker);
+
+        datepicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(v);
+            }
+        });
+
+        timepicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimePickerDialog(v);
+            }
+        });
+
         Timer t = new Timer();
         t.schedule(task1,0);
         Timer t2 = new Timer();
@@ -162,17 +180,13 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         MenuItem item1 = menu.add(0, Now, Menu.NONE, "Now");
-        MenuItem item2 = menu.add(0, Date, Menu.NONE, "Visting Date");
-        MenuItem item3 = menu.add(0, Time, Menu.NONE, "Visting Time");
-        MenuItem item4 = menu.add(0, Web, Menu.NONE, "Sandbox Website");
-        MenuItem item5 = menu.add(0, Map, Menu.NONE, "Locate Sandbox");
-        MenuItem item6 = menu.add(0, Phone, Menu.NONE, "Dial");
+        MenuItem item2 = menu.add(0, Web, Menu.NONE, "Sandbox Website");
+        MenuItem item3 = menu.add(0, Map, Menu.NONE, "Locate Sandbox");
+        MenuItem item4 = menu.add(0, Phone, Menu.NONE, "Dial");
         item1.setShortcut('1', 'n');
-        item2.setShortcut('2', 'd');
-        item3.setShortcut('3', 't');
-        item4.setShortcut('4', 'w');
-        item5.setShortcut('5', 'm');
-        item6.setShortcut('6', 'c');
+        item2.setShortcut('4', 'w');
+        item3.setShortcut('5', 'm');
+        item4.setShortcut('6', 'c');
 
 
         return true;
@@ -186,15 +200,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 tutorList.clear();
                 new GetWorkingNowTutors().execute();
                 speak("Tutors on duty");
-                return true;
-
-            case Time:
-                speak("Select time");
-                showTimePickerDialog();
-                return true;
-            case Date:
-                speak("Select date");
-                showDatePickerDialog();
                 return true;
             case Web:
                 viewWebPage();
@@ -340,14 +345,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     }
 
     // date picker method
-    public void showDatePickerDialog() {
+    public void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment();
         FragmentManager fm = MainActivity.this.getFragmentManager();
         newFragment.show(fm, "datePicker");
     }
 
     // time picker method
-    public void showTimePickerDialog() {
+    public void showTimePickerDialog(View v) {
         DialogFragment newFragment = new TimePickerFragment();
         FragmentManager fm2 = MainActivity.this.getFragmentManager();
         newFragment.show(fm2, "timePicker");
