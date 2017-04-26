@@ -11,30 +11,21 @@
     tools:context="com.xu.jialu.sandboxgo.MainActivity">
 
     <TextView
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView1"
-        android:text="Now Working Tutors"
-        android:textSize="20sp"
+        android:fontFamily="casual"
+        android:text="Tutors On Duty"
         android:textAllCaps="true"
-        android:typeface="normal"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@color/colorPrimaryDark"
-        android:fontFamily="casual" />
-
-
-    <ListView
-        android:id="@+id/list"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/dateText" />
+        android:typeface="normal" />
 
     <Button
         android:layout_width="wrap_content"
         android:text="Choose Date"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:id="@+id/datePicker"
         android:layout_below="@+id/textView1"
         android:layout_alignParentLeft="true"  />
@@ -42,7 +33,7 @@
     <Button
         android:layout_width="wrap_content"
         android:text="Choose Time"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:id="@+id/timePicker"
         android:layout_below="@+id/textView1"
         android:layout_toRightOf="@+id/datePicker"
@@ -50,16 +41,25 @@
         android:layout_marginLeft="12dp"
         android:layout_marginStart="12dp" />
 
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="450dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="#fff8c0"
+        android:layout_below="@+id/dateText"/>
+
     <TextView
-        android:text="Choose a date"
+        android:id="@+id/dateText"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:paddingLeft="5dp"
-        android:textSize="20sp"
-        android:id="@+id/dateText"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@id/datePicker"
-        />
+        android:paddingLeft="5dp"
+        android:text="Select date"
+        android:textSize="20sp" />
 
 
     <TextView
@@ -70,20 +70,16 @@
         android:textSize="20sp"
         android:id="@+id/timeText"
         android:layout_alignLeft="@id/timePicker"
-        android:layout_toRightOf="@+id/dateText"
-        android:layout_below="@id/timePicker"
-        />
+        android:layout_below="@id/timePicker" />
 
-    <Button
-        android:text="Now"
-        android:textColor="@color/colorPrimary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/timePicker"
-        android:layout_toRightOf="@+id/timePicker"
-        android:layout_toEndOf="@+id/timePicker"
-        android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp"
-        android:id="@+id/now" />
+    <ImageView android:id="@+id/simple_anim"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="-10dp"
+        android:layout_marginRight="-10dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerInParent="true"/>
+
 
 </RelativeLayout>
