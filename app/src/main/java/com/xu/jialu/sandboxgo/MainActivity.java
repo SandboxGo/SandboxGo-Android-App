@@ -64,17 +64,19 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private String TAG = MainActivity.class.getSimpleName();
     private static final String BASICURL = "https://www.googleapis.com/calendar/v3/calendars/bentleycis@gmail.com/events?&singleEvents=true&orderBy=startTime&timeMin=";
     private static final String APIKEY = "&key=AIzaSyBXwv2VXYi1Xd6w04suJlAc2bhSO57xr-Y";
-    private static final String IMAGESUFFIX = "-150x150.jpg";
-    final int Now = Menu.FIRST + 1;
-    final int Web = Menu.FIRST + 2;
-    final int Map = Menu.FIRST + 3;
-    final int Phone = Menu.FIRST + 4;
+    private static final String IMAGESUFFIX = "-150x150.jpg"; // images are from Sandbox WordPress website
     BroadcastReceiver receiver;
     Intent intent = new Intent("hours");
     Message finalmsg;
     private TextToSpeech speaker;
 
+    // options menu
+    final int Now = Menu.FIRST + 1;
+    final int Web = Menu.FIRST + 2;
+    final int Map = Menu.FIRST + 3;
+    final int Phone = Menu.FIRST + 4;
 
+    // time formatting variables
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     String formattedCurrentTime = sdf.format(new Date()).substring(0, 19) + "-04:00"; // UTC - 4 hours
     String formattedTimeMax = sdf.format(new Date()).substring(0, 11) + "23:59:59-04:00"; // End of day (UTC - 4 hours)
@@ -129,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         AnimationRoutine1 task1 = new AnimationRoutine1();
         AnimationRoutine2 task2 = new AnimationRoutine2();
 
+        // set date picker and time picker
         Button datepicker;
         Button timepicker;
         datepicker = (Button) findViewById(R.id.datePicker);
@@ -452,7 +455,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     }
 
 
-    // Get selected-time working tutors via an AsyncTask
+    // Get selected-time working tutors via another AsyncTask
     private class GetWorkingTutors extends AsyncTask<Void, Void, Void> {
 
         @Override
