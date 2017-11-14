@@ -78,8 +78,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     // time formatting variables
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-    String formattedCurrentTime = sdf.format(new Date()).substring(0, 19) + "-04:00"; // UTC - 4 hours
-    String formattedTimeMax = sdf.format(new Date()).substring(0, 11) + "23:59:59-04:00"; // End of day (UTC - 4 hours)
+    String formattedCurrentTime = sdf.format(new Date()).substring(0, 19) + "-05:00"; // UTC - 5 hours
+    String formattedTimeMax = sdf.format(new Date()).substring(0, 11) + "23:59:59-05:00"; // End of day (UTC - 5 hours)
     Date currentTime;
     Date newDateAndTime;
     Date startTime;
