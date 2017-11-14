@@ -609,57 +609,67 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             case "max":
                 return "IT101, CS603, CS605, CS607";
             case "mark":
-                return "IT101, CS603, CS605, CS607";
+                return "IT101";
             case "emilyk":
-                return "IT101, CS603, CS605, CS607";
+                return "CS150, CS240, CS350, IT101";
             case "jake":
-                return "IT101, CS603, CS605, CS607";
-            case "tim":
-                return "IT101, CS603, CS605, CS607";
+                return "IT101, CS150, CS350, CS180, CS280";
+            case "danna":
+                return "IT101, CS603, CS605, CS607, CS610";
             case "karan":
                 return "IT101, CS603, CS605, CS607";
-            case "nicollette":
-                return "IT101, CS603, CS605, CS607";
+            case "shujuan":
+                return "IT101, CS150, CS213, CS350, CS360";
             case "emilyz":
-                return "IT101, CS603, CS605, CS607";
+                return "IT101, CS150, CS180, CS280";
             case "brandon":
-                return "IT101, CS603, CS605, CS607";
-            case "taylor":
-                return "IT101, CS603, CS605, CS607";
-            case "yang":
-                return "IT101, CS603, CS605, CS607";
-            case "jacob":
-                return "IT101, CS603, CS605, CS607";
+                return "IT101, CS350, CS 360, CS180, CS150";
+            case "josh":
+                return "IT 101, CS150, CS180, CS213, CS480";
+            case "frankie":
+                return "IT101, CS150, CS180, CS280, CS299, CS350";
+            case "carmen":
+                return "IT101, CS605";
+            case "robert":
+                return "IT101, CS150";
             case "jonathan":
-                return "IT101, CS603, CS605, CS607";
+                return "IT101, CS150, CS480, CS180, CS280";
             case "saalik":
-                return "IT101, CS603, CS605, CS607";
+                return "IT101, CS150, CS180, CS280, CS350, CS360";
             case "yue":
                 return "IT101, CS603, CS605, CS607";
-            case "mae":
-                return "IT101, CS603, CS605, CS607";
+            case "colby":
+                return "IT101, CS150, CS213, CS350";
             case "rob":
                 return "IT101, CS603, CS605, CS607";
             case "angela":
                 return "IT101, CS603, CS605, CS607";
-            case "kaitlyn":
-                return "IT101, CS603, CS605, CS607";
-            case "michael":
-                return "IT101, CS603, CS605, CS607";
+            case "henry":
+                return "IT101, CS150, CS180";
+            case "mike":
+                return "IT101, CS150, CS240";
+            case "olivia":
+                return "CS150, CS180, CS350, IT101";
             case "anoushka":
-                return "IT101, CS603, CS605, CS607";
-            case "sejin":
-                return "IT101, CS603, CS605, CS607";
-            case "sebastian":
-                return "IT101, CS603, CS605, CS607";
-            case "becky":
-                return "IT101, CS603, CS605, CS607";
-            case "sumant":
-                return "IT101, CS603, CS605, CS607";
-            case "pranita":
-                return "IT101, CS603, CS605, CS607";
-            case "andrew":
-                return "IT101, CS603, CS605, CS607";
+                return "IT101,CS150,CS180,CS213,CS350";
+            case "anika":
+                return "CS150, CS180, CS213, CS240, IT101, CS350";
+            case "darren":
+                return "IT101, CS150";
+            case "ridwaan":
+                return "IT101, CS150";
+            case "ankita":
+                return "IT101, CS180, CS213, CS280, CS350, CS380, CS603, CS612, CS650";
+            case "anh":
+                return "IT101, CS180, CS213, CS350, CS680";
+            case "rahil":
+                return "IT101, CS150, CS180, CS280, CS350";
+            case "shashwat":
+                return "IT101, CS150, CS213, CS240, CS350, CS360, CS420, CS440, CS460, CS607";
+            case "ryan":
+                return "IT101, CS150";
+            case "alexa":
+                return "IT 101, CS150, CS240, CS350";
         }
         return "Sorry, no course information for this tutor";
     }
