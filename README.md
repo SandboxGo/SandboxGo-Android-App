@@ -1,7 +1,6 @@
 # SandboxGo
 Android App: Bentley CIS Sandbox Tutor Finder
 
-![screenshot](images/ss1.png "Screenshot")
-![screenshot](images/ss2.png "Screenshot")
-![screenshot](images/ss3.png "Screenshot")
-
+<img src="images/ss1.png" alt="screenshot" style="width: 300px;"/>
+<img src="images/ss2.png" alt="screenshot" style="width: 300px;"/>
+<img src="images/ss3.png" alt="screenshot" style="width: 300px;"/>
